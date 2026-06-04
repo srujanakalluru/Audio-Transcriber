@@ -1,0 +1,105 @@
+<div class="page-wrap">
+  <div class="container">
+    <header>
+      <div class="header-row">
+        <div>
+          <p class="eyebrow">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <rect x="0"   y="3.5" width="1.8" height="4"   rx="0.9" fill="currentColor"/>
+              <rect x="3"   y="1.5" width="1.8" height="8"   rx="0.9" fill="currentColor"/>
+              <rect x="6"   y="0"   width="1.8" height="11"  rx="0.9" fill="currentColor"/>
+              <rect x="9"   y="2.5" width="1.8" height="6"   rx="0.9" fill="currentColor"/>
+            </svg>
+            Speech to Text
+          </p>
+          <h1>Audio Transcriber</h1>
+          <p class="subtitle">Upload any audio and get a precise, timestamped transcript.</p>
+        </div>
+        <div class="header-actions">
+          <button
+            class="settings-btn"
+            [class.active]="showSettings()"
+            (click)="toggleSettings()"
+            aria-label="Settings"
+          >
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7.5 1V2.5M7.5 12.5V14M1 7.5H2.5M12.5 7.5H14M2.7 2.7L3.8 3.8M11.2 11.2L12.3 12.3M12.3 2.7L11.2 3.8M3.8 11.2L2.7 12.3"
+                    stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Settings
+            @if (hasSaved()) {
+              <span class="key-saved-dot" title="API key saved"></span>
+            }
+          </button>
+          <app-theme-toggle />
+        </div>
+      </div>
+    </header>
+
+    @if (showSettings()) {
+      <app-settings-panel
+        [(apiKey)]="apiKey"
+        [(showKey)]="showKey"
+        [hasSaved]="hasSaved()"
+        [keyChanged]="keyChanged()"
+        (save)="saveKey()"
+        (clear)="clearKey()"
+      />
+    }
+
+    <div class="layout-grid">
+      <div class="col-left">
+        <app-api-key-card
+          [(apiKey)]="apiKey"
+          [(showKey)]="showKey"
+          [hasSaved]="hasSaved()"
+          [keyChanged]="keyChanged()"
+          (save)="saveKey()"
+          (clear)="clearKey()"
+        />
+        <app-file-drop-card [(selectedFile)]="selectedFile" />
+      </div>
+
+      <div class="col-right">
+        <app-options-card
+          [(options)]="options"
+          [(speakerAName)]="speakerAName"
+          [(speakerBName)]="speakerBName"
+        />
+      </div>
+    </div>
+
+    <button
+      class="cta-btn"
+      [disabled]="!isReady() || isProcessing()"
+      (click)="startTranscription()"
+    >
+      @if (isProcessing()) {
+        <span class="cta-spin"></span>
+        Transcribing…
+      } @else {
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <polygon points="3,1.5 13,7 3,12.5" fill="white"/>
+        </svg>
+        Transcribe Audio
+      }
+    </button>
+
+    @if (isProcessing()) {
+      <app-progress-card [statusText]="statusText()" [progress]="progress()" />
+    }
+
+    @if (status() === 'error') {
+      <app-error-card [message]="errorMessage()" />
+    }
+
+    @if (status() === 'done' && result(); as r) {
+      <app-result-card
+        [result]="r"
+        [speakerAName]="speakerAName()"
+        [speakerBName]="speakerBName()"
+      />
+    }
+  </div>
+</div>

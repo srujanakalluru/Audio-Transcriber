@@ -1,0 +1,69 @@
+<div class="card result-wrap">
+  <div class="result-topbar">
+    <div class="done-pill">
+      <span class="done-dot"></span>
+      Complete
+    </div>
+    <div class="topbar-right">
+      @if (result().options.speakers)   { <span class="tag">Speakers</span> }
+      @if (result().options.timestamps) { <span class="tag">Timestamps</span> }
+      @if (result().options.pace)       { <span class="tag">Pace</span> }
+      <button class="copy-pill" [class.done]="copyLabel() === 'Copied'" (click)="copyTranscript()">
+        @if (copyLabel() === 'Copy') {
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M1 8V2C1 1.45 1.45 1 2 1H8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        } @else {
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1.5 6.5L4.5 9.5L10.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        }
+        {{ copyLabel() }}
+      </button>
+    </div>
+  </div>
+
+  @if (result().options.pace) {
+    <div class="legend">
+      <span class="legend-dot slow"></span><span class="legend-lbl">Slow &lt;90</span>
+      <span class="legend-dot normal"></span><span class="legend-lbl">Normal 90–160</span>
+      <span class="legend-dot fast"></span><span class="legend-lbl">Fast &gt;160 wpm</span>
+    </div>
+  }
+
+  @if (result().segments.length > 0) {
+    <div class="segs">
+      @for (seg of result().segments; track seg.start) {
+        <div class="seg" [attr.data-pace]="result().options.pace ? seg.pace?.label : null">
+          @if (result().options.speakers && seg.speakerSlot) {
+            <div class="spk-row">
+              <span class="spk-chip" [class.b]="seg.speakerSlot === 'B'">
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <circle cx="4.5" cy="3" r="1.7" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M1 8.5C1 6.7 2.6 5.5 4.5 5.5C6.4 5.5 8 6.7 8 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+                {{ speakerDisplayName(seg.speakerSlot) }}
+              </span>
+            </div>
+          }
+          @if (result().options.timestamps || result().options.pace) {
+            <div class="seg-meta">
+              @if (result().options.timestamps) {
+                <code class="ts-off">{{ secsToElapsed(seg.start) }}</code>
+                <span class="ts-sep">·</span>
+                <code class="ts-dur">{{ (seg.end - seg.start) | number:'1.0-0' }}s</code>
+              }
+              @if (result().options.pace && seg.pace) {
+                <span class="wpm-chip" [ngClass]="'wpm-' + seg.pace.label">{{ seg.pace.wpm }} wpm</span>
+              }
+            </div>
+          }
+          <p class="seg-body">{{ seg.text.trim() }}</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="plain-text">{{ result().text || '(No speech detected)' }}</p>
+  }
+</div>
