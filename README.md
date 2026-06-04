@@ -2,6 +2,8 @@
 
 Browser-based audio transcription powered by Groq's Whisper Large v3 Turbo. Upload an audio or video file and get a transcript with optional speaker labels, timestamps, and per-segment pace.
 
+Live at [srujanakalluru.github.io/Audio-Transcriber](https://srujanakalluru.github.io/Audio-Transcriber/).
+
 ## Features
 
 - Drag-and-drop or click-to-browse file upload (any audio or video format the browser can decode)
